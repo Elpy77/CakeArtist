@@ -1,0 +1,92 @@
+DROP TABLE IF EXISTS Consegna;
+DROP TABLE IF EXISTS Ordine;
+DROP TABLE IF EXISTS FarcituraTorta;
+DROP TABLE IF EXISTS Torta;
+DROP TABLE IF EXISTS ClienteRegistrato;
+DROP TABLE IF EXISTS CakeArtist;
+DROP TABLE IF EXISTS Rider;
+
+CREATE TABLE Torta (
+    ID_Torta INT AUTO_INCREMENT PRIMARY KEY,
+    Foto VARCHAR(255) NOT NULL,
+    Descrizione VARCHAR(50) NOT NULL,
+    PrezzoAlKg DECIMAL(6, 2) NOT NULL);
+
+CREATE TABLE FarcituraTorta (
+    Farcitura VARCHAR(50) NOT NULL,
+    TortaID_Torta INT NOT NULL,
+    PRIMARY KEY (Farcitura, TortaID_Torta),
+    FOREIGN KEY (TortaID_Torta) REFERENCES Torta(ID_Torta) ON DELETE CASCADE);
+
+CREATE TABLE ClienteRegistrato (
+    Username VARCHAR(30) PRIMARY KEY,
+    Password VARCHAR(30) NOT NULL,
+    Cognome VARCHAR(30) NOT NULL,
+    Nome VARCHAR(50) NOT NULL,
+    NumeroDiTelefono VARCHAR(15) NOT NULL,
+    Email VARCHAR(100) NOT NULL,
+    Indirizzo VARCHAR(100) NOT NULL);
+
+CREATE TABLE CakeArtist (
+    ID_CakeArtist INT AUTO_INCREMENT PRIMARY KEY,
+    Indirizzo VARCHAR(100) NOT NULL,
+    Email VARCHAR(100) NOT NULL);
+
+CREATE TABLE Rider (
+    ID_Rider INT AUTO_INCREMENT PRIMARY KEY,
+    Email VARCHAR(100) NOT NULL);
+
+CREATE TABLE Ordine (
+    ID_Ordine INT AUTO_INCREMENT PRIMARY KEY,
+    DataPrenotazione DATE NOT NULL,
+    Peso INT NOT NULL,
+    Farcitura VARCHAR(50) NOT NULL,
+    Scritta VARCHAR(100) NULL,
+    GiornoDiConsegna DATE NOT NULL,
+    Stato VARCHAR(50) NOT NULL,
+    PrezzoTotale DECIMAL(6, 2) NOT NULL,
+    ClienteRegistratoUsername VARCHAR(30) NOT NULL,
+    TortaID_Torta INT NOT NULL,
+    CakeArtistID_CakeArtist INT NULL,
+    FOREIGN KEY (ClienteRegistratoUsername) REFERENCES ClienteRegistrato(Username),
+    FOREIGN KEY (TortaID_Torta) REFERENCES Torta(ID_Torta),
+    FOREIGN KEY (CakeArtistID_CakeArtist) REFERENCES CakeArtist(ID_CakeArtist));
+
+CREATE TABLE Consegna (
+    ID_Consegna INT AUTO_INCREMENT PRIMARY KEY,
+    LuogoDiRitiro VARCHAR(100) NOT NULL,
+    DataDiRitiro DATE NOT NULL,
+    OraDiRitiro TIME NOT NULL,
+    OraPrevistaConsegna TIME NULL,
+    OrdineID_Ordine INT NOT NULL UNIQUE,
+    RiderID_Rider INT NULL,
+    FOREIGN KEY (OrdineID_Ordine) REFERENCES Ordine(ID_Ordine),
+    FOREIGN KEY (RiderID_Rider) REFERENCES Rider(ID_Rider));
+
+INSERT INTO Torta (ID_Torta, Foto, Descrizione, PrezzoAlKg) VALUES
+    (1, 'img/millefoglie.jpg', 'Millefoglie', 30.00),
+    (2, 'img/caprese.jpg', 'Caprese', 25.00),
+    (3, 'img/sacher.jpg', 'Sacher', 28.00);
+
+INSERT INTO FarcituraTorta (Farcitura, TortaID_Torta) VALUES
+    ('cioccolato', 1), ('crema chantilly', 1), ('crema pasticciera', 1),
+    ('cioccolato', 2), ('cioccolato e amarena', 2),
+    ('cioccolato e panna', 3), ('crema al pistacchio', 3);
+
+INSERT INTO ClienteRegistrato VALUES
+    ('Elpidio', 'pass123', 'Tessitore', 'Elpidio', '3331234567', 'etessitore@gmail.com', 'Corso sicilia 66, Succivo'),
+    ('lbianchi', 'pass456', 'Bianchi', 'Laura', '3409876543', 'lbianchi@email.it', 'Corso Umberto I 45, Napoli');
+
+INSERT INTO CakeArtist (ID_CakeArtist, Indirizzo, Email) VALUES
+    (1, 'Via Chiaia 22, Napoli', 'artist1@cakeartists.it'),
+    (2, 'Via Scarlatti 80, Napoli', 'artist2@cakeartists.it');
+
+INSERT INTO Rider (ID_Rider, Email) VALUES
+    (1, 'rider1@cakeartists.it'),
+    (2, 'rider2@cakeartists.it');
+
+INSERT INTO Ordine (ID_Ordine, DataPrenotazione, Peso, Farcitura, Scritta, GiornoDiConsegna, Stato, PrezzoTotale, ClienteRegistratoUsername, TortaID_Torta, CakeArtistID_CakeArtist) VALUES
+(1, '2026-11-01', 2, 'cioccolato', 'Auguri Marco', '2026-11-04', 'confermato', 50.00, 'lbianchi', 2, 1);
+
+INSERT INTO Consegna (ID_Consegna, LuogoDiRitiro, DataDiRitiro, OraDiRitiro, OraPrevistaConsegna, OrdineID_Ordine, RiderID_Rider) VALUES
+(1, 'Via Chiaia 22, Napoli', '2026-11-04', '15:00:00', '16:30:00', 1, 1);
